@@ -1,1 +1,412 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Promo Hub — Kyuki Saas Bhi Kabhi Bahu Thi</title>
+  <meta name="description" content="Watch promos, BTS and upcoming clips of Kyuki Saas Bhi Kabhi Bahu Thi. New promos added frequently." />
+  <style>
+    :root{--bg:#0b1020;--card:#0f1724;--muted:#94a3b8;--accent:#ff6b6b}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter, system-ui, Arial;color:#e6eef8;background:linear-gradient(180deg,#071129 0%,var(--bg) 100%);}
+    header{padding:18px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .brand{display:flex;gap:12px;align-items:center}
+    .logo{width:44px;height:44px;border-radius:8px;background:linear-gradient(90deg,#ff6b6b,#ffb86b);display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff}
+    h1{font-size:18px;margin:0}
+    nav{display:flex;gap:8px}
+    .tab{padding:8px 12px;border-radius:8px;color:var(--muted);cursor:pointer}
+    .tab.active{background:rgba(255,255,255,0.04);color:#fff}
+    .container{max-width:1100px;margin:18px auto;padding:0 16px}
+    .layout{display:grid;grid-template-columns:2fr 1fr;gap:18px}
+    .card{background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);border-radius:12px;padding:14px}
+    .player{border-radius:12px;overflow:hidden;background:#000}
+    video{width:100%;height:100%;display:block}
+    .meta{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
+    .title{font-size:18px;font-weight:700}
+    .desc{color:var(--muted);font-size:13px;margin-top:6px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-top:14px}
+    .thumb{background:var(--card);border-radius:8px;overflow:hidden;cursor:pointer;transition:transform .18s ease,box-shadow .18s ease}
+    .thumb:hover{transform:translateY(-4px);box-shadow:0 6px 20px rgba(0,0,0,0.6)}
+    .thumb img{width:100%;height:130px;object-fit:cover;display:block}
+    .thumb .tmeta{padding:10px}
+    .tmeta .tname{font-weight:600;font-size:14px}
+    .tmeta .tcat{font-size:12px;color:var(--muted);margin-top:6px}
+    .sidebar{display:flex;flex-direction:column;gap:12px}
+    .btn{background:var(--accent);color:#111;padding:8px 10px;border-radius:8px;border:0;cursor:pointer}
+    .muted{color:var(--muted);font-size:13px}
+    .ad-slot{border:2px dashed rgba(255,255,255,0.04);padding:10px;border-radius:8px;text-align:center;color:var(--muted)}
+    .admin-box{background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);padding:12px;border-radius:10px}
+    input,textarea,select{width:100%;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:#e6eef8}
+    label{font-size:13px;color:var(--muted);display:block;margin-bottom:6px}
+    footer{margin:28px 0;text-align:center;color:var(--muted);font-size:13px}
+    .small{font-size:12px;color:var(--muted)}
+    @media(max-width:900px){.layout{grid-template-columns:1fr}.grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="logo">JH</div>
+      <div>
+        <h1>Promo Hub</h1>
+        <div class="small">Kyuki Saas Bhi Kabhi Bahu Thi — promos & BTS</div>
+      </div>
+    </div>
+    <nav id="tabs">
+      <div class="tab active" data-cat="all">All</div>
+      <div class="tab" data-cat="promos">Promos</div>
+      <div class="tab" data-cat="bts">BTS</div>
+      <div class="tab" data-cat="upcoming">Upcoming</div>
+      <div class="tab" data-cat="spoilers">Spoilers</div>
+    </nav>
+  </header>
 
+  <div class="container">
+    <div class="layout">
+      <main>
+        <div class="card">
+          <div class="player" id="playerBox">
+            <video id="mainVideo" controls playsinline poster="" preload="metadata">
+              <source id="videoSrc" src="" type="video/mp4" />
+              Your browser does not support HTML5 video.
+            </video>
+          </div>
+
+          <div class="meta">
+            <div>
+              <div class="title" id="videoTitle">Select a promo to play</div>
+              <div class="muted" id="videoPosted">—</div>
+            </div>
+            <div>
+              <button class="btn" id="openAdmin">Admin</button>
+            </div>
+          </div>
+
+          <div class="desc" id="videoDesc"></div>
+
+          <div class="ad-slot" id="inpageAd">Ad slot — will load on play</div>
+
+          <div class="grid" id="promoGrid"></div>
+        </div>
+      </main>
+
+      <aside class="sidebar">
+        <div class="card admin-box">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <strong>Quick Upload</strong>
+            <button id="cloudUploadBtn" class="small">Cloudinary</button>
+          </div>
+          <div class="small muted" style="margin-top:8px">Use Cloudinary to upload from phone. Configure CLOUDINARY_CLOUD and UPLOAD_PRESET in config below.</div>
+        </div>
+
+        <div class="card">
+          <strong>Categories</strong>
+          <div style="margin-top:8px" id="categoryList"></div>
+        </div>
+
+        <div class="card">
+          <strong>About</strong>
+          <div class="small muted" style="margin-top:8px">This page stores promos in your browser (localStorage). Use Admin to add/edit/delete. For multi-user, connect to backend.</div>
+        </div>
+      </aside>
+    </div>
+
+    <div style="margin-top:18px" class="card">
+      <strong>SEO Preview & JSON-LD</strong>
+      <pre id="jsonld" style="background:#041022;padding:12px;border-radius:8px;color:#9fb7d8;overflow:auto;max-height:220px"></pre>
+    </div>
+
+    <footer>
+      © Promo Hub — Use ad networks responsibly. Do not enable deceptive popups.
+    </footer>
+  </div>
+
+  <!-- Admin Modal -->
+  <div id="adminModal" style="display:none;position:fixed;inset:0;background:rgba(2,6,23,0.6);align-items:center;justify-content:center;padding:20px">
+    <div style="width:820px;max-width:98%;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);padding:18px;border-radius:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <h3 style="margin:0">Admin Panel</h3>
+        <button id="closeAdmin" class="small">Close</button>
+      </div>
+
+      <div style="margin-top:12px;display:grid;grid-template-columns:1fr 360px;gap:12px">
+        <div>
+          <div style="margin-bottom:8px"><label>ADMIN PASSWORD</label><input id="adminPassInput" placeholder="Enter admin password" /></div>
+          <div style="display:flex;gap:8px;margin-bottom:8px"><button id="unlockBtn" class="btn">Unlock</button><button id="lockBtn" class="small">Lock</button></div>
+
+          <div id="adminArea" style="display:none">
+            <form id="promoForm">
+              <div style="display:grid;grid-template-columns:1fr 120px;gap:8px">
+                <div>
+                  <label>Title</label>
+                  <input id="fTitle" required />
+                </div>
+                <div>
+                  <label>Category</label>
+                  <select id="fCat"><option value="promos">Promos</option><option value="bts">BTS</option><option value="upcoming">Upcoming</option><option value="spoilers">Spoilers</option></select>
+                </div>
+              </div>
+
+              <label>Short description</label>
+              <textarea id="fDesc" rows="3"></textarea>
+
+              <label>Thumbnail URL</label>
+              <input id="fThumb" placeholder="https://..." />
+
+              <label>Video URL (or Google Drive share link)</label>
+              <input id="fVideo" placeholder="https:// or drive.google.com/..." required />
+
+              <div style="display:flex;gap:8px;margin-top:8px">
+                <button class="btn" type="submit">Add / Update Promo</button>
+                <button id="clearForm" class="small" type="button">Clear</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div style="background:rgba(255,255,255,0.02);padding:10px;border-radius:8px;overflow:auto;max-height:420px" id="adminList">
+          <strong>Existing promos</strong>
+          <div id="adminPromos" style="margin-top:8px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  /*********** CONFIG (replace placeholders) ***********/
+  const ADMIN_PASSWORD = 'admin123'; // change this
+  const CLOUDINARY_CLOUD = ''; // e.g. 'demo' — leave empty to disable
+  const CLOUDINARY_UPLOAD_PRESET = ''; // unsigned preset name
+  const POPADS_ID = ''; // PopAds site id if used
+  const MONETAG_SNIPPET = ''; // Paste Monetag script string here (optional)
+  /*****************************************************/
+
+  // Demo data (used when no localStorage)
+  const demo = [
+    {id:'d1',title:'Kyuki Saas — Teaser',desc:'Watch the official teaser',thumb:'https://images.unsplash.com/photo-1505685296765-3a2736de412f?w=900',video:'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',cat:'promos',posted:Date.now()-86400000},
+    {id:'d2',title:'BTS Clip',desc:'Behind the scenes clip',thumb:'https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=900',video:'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm',cat:'bts',posted:Date.now()-3600000}
+  ];
+
+  // State
+  let promos = [];
+  let current = null;
+  let adsInjected = false;
+  const STORAGE_KEY = 'jh_promos_v2';
+
+  // Helper functions
+  function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(promos));}
+  function load(){const raw=localStorage.getItem(STORAGE_KEY);promos = raw?JSON.parse(raw):demo;}
+  function uid(){return 'p'+Date.now()+Math.floor(Math.random()*999);}
+
+  // Convert Google Drive share link to direct link
+  function driveToDirect(url){
+    try{
+      const m = url.match(/[-\w]{25,}/);
+      if(m) return 'https://drive.google.com/uc?export=download&id='+m[0];
+    }catch(e){}
+    return url;
+  }
+
+  // Render grid
+  function renderGrid(filter='all'){
+    const grid = document.getElementById('promoGrid'); grid.innerHTML='';
+    const list = promos.filter(p=> filter==='all' ? true : p.cat===filter);
+    list.forEach(p=>{
+      const el = document.createElement('div'); el.className='thumb';
+      el.innerHTML = `<img src="${p.thumb}" alt="${p.title}" /><div class="tmeta"><div class="tname">${p.title}</div><div class="tcat">${p.cat} • ${new Date(p.posted).toLocaleDateString()}</div></div>`;
+      el.onclick = ()=>selectPromo(p.id);
+      grid.appendChild(el);
+    });
+  }
+
+  function selectPromo(id){
+    current = promos.find(x=>x.id===id); if(!current) return;
+    const src = driveToDirect(current.video);
+    document.getElementById('videoSrc').src = src;
+    const v = document.getElementById('mainVideo');
+    v.poster = current.thumb || '';
+    v.load();
+    document.getElementById('videoTitle').innerText = current.title;
+    document.getElementById('videoDesc').innerText = current.desc || '';
+    document.getElementById('videoPosted').innerText = new Date(current.posted).toLocaleString();
+    generateJsonLd(current);
+  }
+
+  // JSON-LD for SEO
+  function generateJsonLd(p){
+    const ld = {"@context":"https://schema.org","@type":"VideoObject",name:p.title,description:p.desc,thumbnailUrl:p.thumb,uploadDate:new Date(p.posted).toISOString(),contentUrl:p.video};
+    document.getElementById('jsonld').innerText = JSON.stringify(ld,null,2);
+    let existing = document.getElementById('ldScript'); if(existing) existing.remove();
+    const s = document.createElement('script'); s.type='application/ld+json'; s.id='ldScript'; s.text = JSON.stringify(ld); document.head.appendChild(s);
+  }
+
+  function renderCategories(){
+    const cats = ['all','promos','bts','upcoming','spoilers'];
+    const el = document.getElementById('categoryList'); el.innerHTML='';
+    cats.forEach(c=>{
+      const btn = document.createElement('div'); btn.className='tab'+(c==='all'?' active':''); btn.innerText=c.toUpperCase();
+      btn.onclick = ()=>{ document.querySelectorAll('#tabs .tab').forEach(t=>t.classList.remove('active')); document.querySelector('#tabs .tab[data-cat="'+c+'"]')?.classList.add('active'); renderGrid(c); };
+      el.appendChild(btn);
+    });
+  }
+
+  // Admin UI functions
+  function openAdmin(){document.getElementById('adminModal').style.display='flex';}
+  function closeAdmin(){document.getElementById('adminModal').style.display='none';}
+
+  function refreshAdminList(){
+    const container = document.getElementById('adminPromos'); container.innerHTML='';
+    promos.forEach(p=>{
+      const d = document.createElement('div'); d.style.display='flex'; d.style.justifyContent='space-between'; d.style.alignItems='center'; d.style.padding='6px 0';
+      d.innerHTML = `<div style="max-width:70%"><strong>${p.title}</strong><div class="small muted">${p.cat} • ${new Date(p.posted).toLocaleDateString()}</div></div>`;
+      const btns = document.createElement('div'); btns.innerHTML = `<button class="small" data-id="${p.id}">Play</button> <button class="small" data-edit="${p.id}">Edit</button> <button class="small" data-del="${p.id}">Delete</button>`;
+      d.appendChild(btns); container.appendChild(d);
+      btns.querySelector('[data-id]').onclick = ()=>selectPromo(p.id);
+      btns.querySelector('[data-edit]').onclick = ()=>populateForm(p.id);
+      btns.querySelector('[data-del]').onclick = ()=>{ if(confirm('Delete this promo?')){ promos = promos.filter(x=>x.id!==p.id); save(); renderGrid(); refreshAdminList(); } };
+    });
+  }
+
+  function populateForm(id){
+    const p = promos.find(x=>x.id===id); if(!p) return;
+    document.getElementById('fTitle').value = p.title;
+    document.getElementById('fDesc').value = p.desc;
+    document.getElementById('fThumb').value = p.thumb;
+    document.getElementById('fVideo').value = p.video;
+    document.getElementById('fCat').value = p.cat;
+    document.getElementById('promoForm').dataset.edit = id;
+  }
+
+  // Setup events & initial load
+  document.addEventListener('DOMContentLoaded',()=>{
+    load(); renderGrid(); renderCategories(); refreshAdminList();
+
+    document.querySelectorAll('#tabs .tab').forEach(t=>{
+      t.onclick = ()=>{
+        document.querySelectorAll('#tabs .tab').forEach(x=>x.classList.remove('active'));
+        t.classList.add('active');
+        renderGrid(t.dataset.cat);
+      };
+    });
+
+    document.getElementById('openAdmin').onclick = openAdmin;
+    document.getElementById('closeAdmin').onclick = closeAdmin;
+
+    document.getElementById('unlockBtn').onclick = ()=>{
+      const val = document.getElementById('adminPassInput').value;
+      if(val === ADMIN_PASSWORD){ document.getElementById('adminArea').style.display='block'; document.getElementById('adminPassInput').value=''; refreshAdminList(); }
+      else alert('Wrong password');
+    };
+    document.getElementById('lockBtn').onclick = ()=>{ document.getElementById('adminArea').style.display='none'; };
+
+    document.getElementById('cloudUploadBtn').onclick = ()=>{
+      if(!CLOUDINARY_CLOUD || !CLOUDINARY_UPLOAD_PRESET){ alert('Configure CLOUDINARY_CLOUD and UPLOAD_PRESET in the template'); return; }
+      openCloudinaryWidget();
+    };
+
+    document.getElementById('promoForm').onsubmit = (e)=>{
+      e.preventDefault();
+      const editId = e.target.dataset.edit;
+      const title = document.getElementById('fTitle').value;
+      const desc = document.getElementById('fDesc').value;
+      let thumb = document.getElementById('fThumb').value;
+      let video = document.getElementById('fVideo').value;
+      video = driveToDirect(video);
+      if(editId){
+        const idx = promos.findIndex(x=>x.id===editId);
+        promos[idx] = {...promos[idx], title, desc, thumb, video, cat:document.getElementById('fCat').value};
+        delete e.target.dataset.edit;
+      } else {
+        promos.unshift({id:uid(), title, desc, thumb, video, cat:document.getElementById('fCat').value, posted:Date.now()});
+      }
+      save(); renderGrid(); refreshAdminList(); e.target.reset(); alert('Saved');
+    };
+
+    document.getElementById('clearForm').onclick = ()=>{ document.getElementById('promoForm').reset(); delete document.getElementById('promoForm').dataset.edit; };
+
+    document.getElementById('adminModal').onclick = (ev)=>{ if(ev.target.id === 'adminModal') closeAdmin(); };
+
+    const mainV = document.getElementById('mainVideo');
+    mainV.addEventListener('play', ()=>{
+      if(!adsInjected){ injectAds(); adsInjected = true; }
+    });
+  });
+
+  // Cloudinary unsigned upload (fallback using HTML file input)
+  function openCloudinaryWidget(){
+    const fileInput = document.createElement('input'); fileInput.type='file'; fileInput.accept='video/*,image/*';
+    fileInput.onchange = async ()=>{
+      const file = fileInput.files[0]; if(!file) return;
+      const fd = new FormData(); fd.append('file', file); fd.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+      const url = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/auto/upload`;
+      try{
+        const res = await fetch(url, { method:'POST', body:fd });
+        const data = await res.json();
+        if(data.secure_url){
+          document.getElementById('fVideo').value = data.secure_url;
+          document.getElementById('fThumb').value = data.secure_url + (data.resource_type && data.resource_type.startsWith('video') ? '#poster' : '');
+          alert('Uploaded — URL added to video field. Fill title & save.');
+        } else alert('Upload failed');
+      }catch(err){ console.error(err); alert('Upload error'); }
+    };
+    fileInput.click();
+  }
+
+  // Inject ad networks only after user plays video
+  function injectAds(){
+    // PopAds: replace with your official snippet or use POPADS_ID if you have it
+    if(POPADS_ID){
+      try{
+        window._pop = window._pop || [];
+        window._pop.push(['siteId', POPADS_ID]);
+        const s = document.createElement('script'); s.async = true; s.src = 'https://cdn.popads.net/pop.js'; document.body.appendChild(s);
+      } catch(e){ console.warn('PopAds injection failed', e); }
+    }
+    // Monetag: insert user-provided snippet string (MONETAG_SNIPPET)
+    if(MONETAG_SNIPPET && MONETAG_SNIPPET.trim().length > 10){
+      const s = document.createElement('script'); s.type = 'text/javascript'; s.text = MONETAG_SNIPPET; document.body.appendChild(s);
+    }
+    const slot = document.getElementById('inpageAd'); slot.innerHTML = '<em>Ad loaded (PopAds/Monetag)</em>';
+  }
+
+  </script>
+
+  <!-- Minimal data + logic loader -->
+  <script>
+    // Initial promo data — you can edit this JSON or use the Admin to add items
+    const initialData = [
+      {"title":"Kyuki Saas Bhi Kabhi Bahu Thi – Promo 1","thumbnail":"https://images.unsplash.com/photo-1505685296765-3a2736de412f?w=800","video":"https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4","cat":"promos"},
+      {"title":"Exclusive BTS Clip","thumbnail":"https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=800","video":"https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm","cat":"bts"}
+    ];
+
+    // expose a simple loader to populate promos from initialData on first load
+    (function(){
+      // add load/save functions used by main script if not present
+      if(!window.load){
+        window.load = function(){ const raw = localStorage.getItem('jh_promos_v2'); if(raw) { promos = JSON.parse(raw); } else { promos = initialData.map((p,i)=>({ id: 'p'+(Date.now()+i), title:p.title, desc:'', thumb:p.thumbnail, video:p.video, cat:p.cat, posted: Date.now()-i*3600000 })); save(); } };
+        window.save = function(){ localStorage.setItem('jh_promos_v2', JSON.stringify(promos)); };
+      }
+      // After DOM is ready the main script's DOMContentLoaded handler runs and uses load()/renderGrid()
+    })();
+  </script>
+
+  <!-- Admin HTML elements that main script expects -->
+  <script>
+    // Add missing admin buttons into the modal if script is loaded into a simple editor (ensures unlockBtn/lockBtn exist)
+    (function ensureAdminButtons(){
+      // If unlockBtn etc. already present skip
+      if(!document.getElementById('unlockBtn')){
+        const unlock = document.createElement('button'); unlock.id='unlockBtn'; unlock.style.display='none'; document.body.appendChild(unlock);
+      }
+      if(!document.getElementById('lockBtn')){
+        const lock = document.createElement('button'); lock.id='lockBtn'; lock.style.display='none'; document.body.appendChild(lock);
+      }
+    })();
+  </script>
+
+  <!-- Replace with actual network scripts in these placeholders as needed -->
+  <!-- PopAds & Monetag placeholders:
+       - To enable PopAds set POPADS_ID in config above OR replace injectAds with your full snippet.
+       - To enable Monetag paste their snippet into MONETAG_SNIPPET variable in the config section. -->
+</body>
+</html>
